@@ -6,9 +6,10 @@ class Program
     {
         List<int> numbers = new List<int>(); 
         int userNumbers = -1;
+        Console.WriteLine("Enter a list of numbers, type 0 when finished.");
         while(userNumbers !=0)
         {
-            Console.WriteLine("Enter a list of numbers, type 0 when finished.");
+            
             Console.Write("Enter number:");
             string response = Console.ReadLine();
             userNumbers = int.Parse(response);
