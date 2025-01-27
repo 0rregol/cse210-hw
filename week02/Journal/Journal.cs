@@ -29,28 +29,44 @@ public class Journal
 
     
     public void SaveToFile(string filename)
+{
+    using (StreamWriter outputFile = new StreamWriter(filename))
     {
-        using (StreamWriter outputFile = new StreamWriter(filename)) 
+        // Escribir la cabecera del CSV
+        outputFile.WriteLine("Date,Prompt,Response");
+
+        foreach (var entry in Entries)
         {
-            foreach (var entry in Entries) 
-            {
-                
-                outputFile.WriteLine($"{entry.Date}|{entry.Prompt}|{entry.Response}");
-            }
+            // Escapar comillas en el contenido
+            string escapedPrompt = entry.Prompt.Replace("\"", "\"\"");
+            string escapedResponse = entry.Response.Replace("\"", "\"\"");
+
+            // Escribir la entrada en formato CSV
+            outputFile.WriteLine($"\"{entry.Date}\",\"{escapedPrompt}\",\"{escapedResponse}\"");
         }
     }
+}
 
    
-    public void LoadFromFile(string filename)
-    {
-        Entries.Clear(); 
-        string[] lines = File.ReadAllLines(filename); 
+public void LoadFromFile(string filename)
+{
+    Entries.Clear(); // Limpiar entradas actuales
+    string[] lines = File.ReadAllLines(filename);
 
-        foreach (string line in lines) 
-        {
-            string[] parts = line.Split('|'); 
-            Entry entry = new Entry(parts[1], parts[2], parts[0]);
-            Entries.Add(entry); 
-        }
+    // Saltar la cabecera (primera línea)
+    for (int i = 1; i < lines.Length; i++)
+    {
+        string line = lines[i];
+        string[] parts = line.Split(',');
+
+        // Eliminar comillas y manejar contenido escapado
+        string date = parts[0].Trim('"');
+        string prompt = parts[1].Trim('"').Replace("\"\"", "\"");
+        string response = parts[2].Trim('"').Replace("\"\"", "\"");
+
+        // Crear una nueva entrada
+        Entry entry = new Entry(prompt, response, date);
+        Entries.Add(entry);
     }
+}
 }
